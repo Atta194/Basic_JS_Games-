@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Rock-Paper-Scissors</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css">
+    <style>
+      body {
+        background-color: #384e1b;
+        color: #fff;
+      }
+      .container {
+        margin-top: 50px;
+        text-align: center;
+      }
+
+      .choices {
+        display: flex;
+        justify-content: center;
+        margin-top: 50px;
+      }
+
+      .choice {
+        font-size: 80px;
+        margin: 0 20px;
+        cursor: pointer;
+        transition: transform 0.2s;
+        opacity: 0.6;
+      }
+
+      .choice:hover {
+        opacity: 0.8;
+        transform: scale(1.2);
+      }
+
+      .fa-hand-rock {
+        color: #adb1b4;
+      }
+
+      .fa-hand-paper {
+        color: #6699bb;
+      }
+
+      .fa-hand-scissors {
+        color: #eb4933;
+      }
+
+      .result {
+        margin-top: 20px;
+      }
+
+      .score {
+        text-align: center;
+        font-size: 24px;
+        margin: 20px 0px;
+      }
+
+      .game-result {
+        text-align: center;
+        font-size: 32px;
+        margin: 20px 0px;
+      }
+
+      .new-game {
+        margin-top: 30px;
+      }
+
+      .reset-game {
+        margin-top: 30px;
+        margin-left: 10px;
+      }
+
+      .fa-redo-alt {
+        color: #fff;
+        font-size: 20px;
+        margin-right: 5px;
+      }
+
+      .fa-plus-circle {
+        color: #fff;
+        font-size: 20px;
+        margin-right: 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Rock-Paper-Scissors</h1>
+      <div class="choices">
+        <i class="fas fa-hand-rock choice" data-choice="rock"></i>
+        <i class="fas fa-hand-paper choice" data-choice="paper"></i>
+        <i class="fas fa-hand-scissors choice" data-choice="scissors"></i>
+      </div>
+      <div class="result"></div>
+      <div class="score">Score: <span class="player-score">0</span> - <span class="computer-score">0</span></div>
+      <div class="game-result"></div>
+      <div class="button-container">
+        <button class="new-game btn btn-success"><i class="fas fa-plus-circle"></i>New Game</button>
+        <button class="reset-game btn btn-danger"><i class="fas fa-redo-alt"></i>Reset Game</button>
+      </div>
+    </div>
+      <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+      <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script>
+
+      $(document).ready(function() {
+        var playerScore = 0;
+        var computerScore = 0;
+
+        $(".choice").click(function() {
+          var playerChoice = $(this).data("choice");
+          var computerChoice = generateComputerChoice();
+          var result = getResult(playerChoice, computerChoice);
+
+          updateResult(result, playerChoice, computerChoice);
+          updateScore(result);
+
+          if (playerScore == 5 || computerScore == 5) {
+            endGame();
+          }
+        });
+
+        $(".new-game").click(function() {
+          location.reload();
+        });
+
+        $(".reset-game").click(function() {
+          resetGame();
+          $(".player-score").text("0");
+          $(".computer-score").text("0");
+        });
+
+        function generateComputerChoice() {
+          var choices = ["rock", "paper", "scissors"];
+          var randomIndex = Math.floor(Math.random() * 3);
+          return choices[randomIndex];
+        }
+
+        function getResult(playerChoice, computerChoice) {
+          if (playerChoice == computerChoice) {
+            return "tie";
+          } else if (
+            (playerChoice == "rock" && computerChoice == "scissors") ||
+            (playerChoice == "paper" && computerChoice == "rock") ||
+            (playerChoice == "scissors" && computerChoice == "paper")
+          ) {
+            return "win";
+          } else {
+            return "lose";
+          }
+        }
+
+        function updateResult(result, playerChoice, computerChoice) {
+          var resultText = "";
+
+          if (result == "tie") {
+            resultText = "It's a tie!";
+          } else if (result == "win") {
+            resultText = "You win! " + playerChoice + " beats " + computerChoice + ".";
+          } else {
+            resultText = "You lose! " + computerChoice + " beats " + playerChoice + ".";
+          }
+
+          $(".result").text(resultText);
+        }
+
+        function updateScore(result) {
+          if (result == "win") {
+            playerScore++;
+          } else if (result == "lose") {
+            computerScore++;
+          }
+
+          $(".player-score").text(playerScore);
+          $(".computer-score").text(computerScore);
+        }
+
+        function endGame() {
+          if (playerScore > computerScore) {
+            $(".game-result").text("You won the game!");
+          } else {
+            $(".game-result").text("You lost the game.");
+          }
+
+          $(".choice").off("click");
+        }
+
+        function resetGame() {
+          playerScore = 0;
+          computerScore = 0;
+          $(".result").text("");
+          $(".game-result").text("");
+          $(".choice").css("opacity", "0.6");
+          $(".choice").off("mouseenter mouseleave");
+          $(".choice").on({
+            mouseenter: function() {
+              $(this).css("opacity", "1");
+            },
+            mouseleave: function() {
+              $(this).css("opacity", "0.6");
+            }
+          });
+        }
+      });
+    </script>
+  </body>
+</html>  
+<!-- Comments For Javascript Code-->
+<!-- 
+  *generateComputerChoice(): This function generates a random choice for the computer player. It does this by selecting a random index in the choices array and returning the value at that index.
+  *getResult(playerChoice, computerChoice): This function determines the result of a game based on the choices made by the player and computer. It returns "win", "lose", or "tie" depending on the outcome of the game.
+  *updateResult(result, playerChoice, computerChoice): This function updates the text of the .result element on the page to display the outcome of a game.
+  *updateScore(result): This function updates the scores displayed on the page based on the outcome of a game. It increments playerScore or computerScore depending on the value of the result parameter.
+  *endGame(): This function is called when either player reaches a score of 5. It updates the text of the .game-result element to indicate whether the player won or lost the game and removes the event listener for the .choice elements.
+  *resetGame(): This function resets the state of the game to its initial values. It sets playerScore and computerScore to 0, clears the text of the .result and .game-result elements, and resets the opacity and event listeners of the .choice elements.-->
