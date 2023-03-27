@@ -104,106 +104,59 @@
       <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
       <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
     <script>
+      let playerScore = 0, computerScore = 0;
+      const choices = ["rock", "paper", "scissors"];
 
-      $(document).ready(function() {
-        var playerScore = 0;
-        var computerScore = 0;
+      function generateComputerChoice() {
+        return choices[Math.floor(Math.random() * 3)];
+      }
 
-        $(".choice").click(function() {
-          var playerChoice = $(this).data("choice");
-          var computerChoice = generateComputerChoice();
-          var result = getResult(playerChoice, computerChoice);
-
-          updateResult(result, playerChoice, computerChoice);
-          updateScore(result);
-
-          if (playerScore == 5 || computerScore == 5) {
-            endGame();
-          }
-        });
-
-        $(".new-game").click(function() {
-          location.reload();
-        });
-
-        $(".reset-game").click(function() {
-          resetGame();
-          $(".player-score").text("0");
-          $(".computer-score").text("0");
-        });
-
-        function generateComputerChoice() {
-          var choices = ["rock", "paper", "scissors"];
-          var randomIndex = Math.floor(Math.random() * 3);
-          return choices[randomIndex];
-        }
-
-        function getResult(playerChoice, computerChoice) {
-          if (playerChoice == computerChoice) {
-            return "tie";
-          } else if (
-            (playerChoice == "rock" && computerChoice == "scissors") ||
+      function getResult(playerChoice, computerChoice) {
+        if (playerChoice == computerChoice) return "tie";
+        if ((playerChoice == "rock" && computerChoice == "scissors") ||
             (playerChoice == "paper" && computerChoice == "rock") ||
-            (playerChoice == "scissors" && computerChoice == "paper")
-          ) {
-            return "win";
-          } else {
-            return "lose";
-          }
-        }
+            (playerChoice == "scissors" && computerChoice == "paper")) return "win";
+        return "lose";
+      }
 
-        function updateResult(result, playerChoice, computerChoice) {
-          var resultText = "";
+      function updateResult(result, playerChoice, computerChoice) {
+        const text = {tie: "It's a tie!",
+                      win: `You win! ${playerChoice} beats ${computerChoice}.`,
+                      lose: `You lose! ${computerChoice} beats ${playerChoice}.`};
+        $(".result").text(text[result]);
+      }
 
-          if (result == "tie") {
-            resultText = "It's a tie!";
-          } else if (result == "win") {
-            resultText = "You win! " + playerChoice + " beats " + computerChoice + ".";
-          } else {
-            resultText = "You lose! " + computerChoice + " beats " + playerChoice + ".";
-          }
+      function updateScore(result) {
+        result == "win" ? playerScore++ : computerScore++;
+        $(".player-score").text(playerScore);
+        $(".computer-score").text(computerScore);
+      }
 
-          $(".result").text(resultText);
-        }
+      function endGame() {
+        const resultText = (playerScore > computerScore) ? "You won the game!" : "You lost the game.";
+        $(".game-result").text(resultText);
+        $(".choice").off("click");
+      }
 
-        function updateScore(result) {
-          if (result == "win") {
-            playerScore++;
-          } else if (result == "lose") {
-            computerScore++;
-          }
+      function resetGame() {
+        playerScore = 0; computerScore = 0;
+        $(".result, .game-result").text("");
+        $(".choice").css("opacity", "0.6").off("mouseenter mouseleave")
+          .on({mouseenter: function() { $(this).css("opacity", "1"); },
+               mouseleave: function() { $(this).css("opacity", "0.6"); }});
+      }
 
-          $(".player-score").text(playerScore);
-          $(".computer-score").text(computerScore);
-        }
-
-        function endGame() {
-          if (playerScore > computerScore) {
-            $(".game-result").text("You won the game!");
-          } else {
-            $(".game-result").text("You lost the game.");
-          }
-
-          $(".choice").off("click");
-        }
-
-        function resetGame() {
-          playerScore = 0;
-          computerScore = 0;
-          $(".result").text("");
-          $(".game-result").text("");
-          $(".choice").css("opacity", "0.6");
-          $(".choice").off("mouseenter mouseleave");
-          $(".choice").on({
-            mouseenter: function() {
-              $(this).css("opacity", "1");
-            },
-            mouseleave: function() {
-              $(this).css("opacity", "0.6");
-            }
-          });
-        }
+      $(".choice").click(function() {
+        const playerChoice = $(this).data("choice"), computerChoice = generateComputerChoice();
+        const result = getResult(playerChoice, computerChoice);
+        updateResult(result, playerChoice, computerChoice);
+        updateScore(result);
+        if (playerScore == 5 || computerScore == 5) endGame();
       });
+
+      $(".new-game").click(function() { location.reload(); });
+      $(".reset-game").click(resetGame);
+
     </script>
   </body>
 </html>  
